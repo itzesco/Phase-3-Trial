@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lab Reservation</title>
+    <link rel="stylesheet" href="css/homescreen.css" />
+    <script defer src="js/homescreen.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <img src="images/logo.png" alt="Logo" class="logo" />
+        <div class="header-container">
+          <!--v12 edited -->
+          <h1 class="headerh2" id="welcomeMessage"></h1>
+          <p class="subheader">Start reserving computer lab seats now!</p>
+        </div>
+
+        <div id="profile-button">
+          <img
+            src="images/circle-user.png"
+            alt="Profile"
+            class="profile-icon"
+          />
+        </div>
+
+        <div id="logout-button">
+          <img src="images/sign-out-alt.png" alt="Logout" class="logout-icon" />
+        </div>
+      </div>
+
+      <div class="input-group">
+        <div class="input-wrapper">
+          <img
+            src="images/search (3).png"
+            alt="Search Icon"
+            class="search-icon"
+          />
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Enter name to find reservation"
+          />
+        </div>
+        <select class="selectclass" id="roomSelect"></select>
+        <input class="dateInput" id="dateSelect" type="date" />
+        <select class="selectclass" id="timeSelect"></select>
+      </div>
+      <div class="computer-grid" id="computerGrid"></div>
+
+      <div class="reserve-container" id="reservationInfo"></div>
+
+      <div class="reserve-container">
+        <button class="reserve-btn" id="reserveBtn" disabled>
+          <img
+            src="images/reserve.png"
+            alt="Reserve Icon"
+            class="reserve-pic"
+          />
+          <!-- edited -->
+          <p class="reserve-text" id="reservedBtnTxt">Reserve Seat</p>
+        </button>
+        <div id="cancel"></div>
+      </div>
+      <div class="box">
+        <div class="card">
+          <div class="card-header">
+            <h1 class="h1-text"> Your Current Reservations</h1>
+          </div>
+          <div class="card-body" id="reservationList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="confirmationModal" class="modal">
+      <div class="modal-content">
+        <h2 class="modal-header">Confirm Reservation</h2>
+        <p class="modal-text">
+          <strong>Room:</strong> <span id="confirmRoom"></span>
+        </p>
+        <p class="modal-text">
+          <strong>Date:</strong> <span id="confirmDate"></span>
+        </p>
+        <p class="modal-text">
+          <strong>Time:</strong> <span id="confirmTime"></span>
+        </p>
+        <p class="modal-text">
+          <strong>Seat:</strong> <span id="confirmSeat"></span>
+        </p>
+        <div class="reserve-anon-container">
+          <!-- edited v9 -->
+          <input type="checkbox" id="anonymous" />
+          <label for="reserve-anon">Reserve anonymously</label>
+        </div>
+        <div class="modal-buttons">
+          <button id="cancelBtn">Cancel</button>
+          <button id="confirmBtn">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+<!-- User Profile Popup -->
+<div class="popup" id="userProfilePopup" style="display: none;">
+  <div class="popup-content">
+    <!-- Close button -->
+    <span class="close-popup" id="closeUserPopup">&times;</span>
+    <div class="profile-header">
+      <img src="images/circle-user.png" class="popup-profile-pic" alt="Profile Picture" />
+      <div>
+        <h2 id="popup-fullname">Full Name</h2>
+        <p id="popup-email">Email</p>
+        <p id="popup-id">ID Num: </p>
+      </div>
+    </div>
+    <div class="popup-section">
+      <h3>Description</h3>
+      <p id="popup-description">Loading...</p>
+    </div>
+    <div class="popup-section">
+      <h3>Current Reservations</h3>
+      <div id="popup-reservations">No reservations found.</div>
+    </div>
+  </div>
+</div>
+
+
+
+  </body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile Manager</title>
+    <link rel="stylesheet" href="css/User Profile.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="profile-header">
+            <img src="images/angle-left.png" alt="Back" class="back-icon" id="back-button">
+            <img src="images/Group 20.png" alt="Profile" class="profile-icon">
+            <div class="profile-info">
+                <p id="user-name"></p>
+                <p class="email"><a id="user-email" href="#"></a></p>
+                <p id="user-id-number"></p>
+            </div>
+  
+            <div class="change-container">
+                <button class="change-btn" data-popup="editPasswordPopup">Change Password</button>
+            </div>
+        </div>
+
+        <div class="popup" id="editPasswordPopup">
+            <div class="popup-content">
+                <span class="close-popup">&times;</span>
+                <h2>Change Password</h2>
+                <p>Your password must be at least 6 characters and include a combination of numbers, letters, and special characters ($@%_).</p>
+                
+                <input type="password" id="current-password" placeholder="Enter your current password">
+                <input type="password" id="new-password" placeholder="Enter your new password">
+                <input type="password" id="retype-password" placeholder="Re-type your new password">
+                
+                <button class="save-btn">Change password</button>
+                <button class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+        
+        <div class="box">
+            <div class="header">
+                <h1 class="h1-text">Personal Information</h1>
+                <img src="images/pencil.png" alt="Edit Icon" class="edit-icon" data-popup="editProfilePopup">
+            </div>
+            <div class="info">
+                <div class="column">
+                    <p class="label">First Name</p>
+                    <p class="value" id="first-name"></p>
+                </div>
+                <div class="column">
+                    <p class="label">Last Name</p>
+                    <p class="value" id="last-name"></p>
+                </div>
+            </div>
+            <div class="info">
+                <div class="column">
+                    <p class="label">DLSU Email Address</p>
+                    <p class="value" id="email"></p>
+                </div>
+                <div class="column">
+                    <p class="label">ID Number</p>
+                    <p class="value" id="id-number"></p>
+                </div> 
+            </div>
+        </div>
+
+        <!-- Edit Personal Information Popup -->
+        <div class="popup" id="editProfilePopup">
+            <div class="popup-content">
+                <span class="close-popup">&times;</span>
+                <h2>Edit Personal Information</h2>
+                
+                <input type="text" id="edit-first-name" placeholder="First Name">
+                <input type="text" id="edit-last-name" placeholder="Last Name">
+                <input type="email" id="edit-email" placeholder="Email Address">
+                
+                <button class="save-btn">Save Changes</button>
+                <button class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+
+        <div class="box">
+            <div class="header">
+                <h1 class="h1-text">Description</h1>
+                <img src="images/pencil.png" alt="Edit Icon" class="edit-icon" data-popup="editDescriptionPopup">
+            </div>
+            <p id="user-bio" class="description"></p>
+        </div>
+        <!--
+        <div class="box">
+            <div class="header">
+                <h1 class="h1-text">Current Reservation</h1>
+            </div>
+            <div class="reservation-box">
+               <p>Room No.: 201</p>
+                <p>Seat No: Comp 2</p>
+                <p>Date: Jan 30, 2025</p>
+                <p>Time: 11:00am - 12:00pm</p>
+            </div>
+        </div> -->
+        
+        <!-- Edit Description Popup -->
+        <div class="popup" id="editDescriptionPopup">
+            <div class="popup-content">
+                <span class="close-popup">&times;</span>
+                <h2>Edit Description</h2>             
+                <textarea id="edit-description" placeholder="Write a description..."></textarea>
+                <button class="save-btn">Save Changes</button>
+                <button class="cancel-btn">Cancel</button>
+            </div>
+        </div>
+
+        <button class="delete-btn" id="deleteAccountBtn">Delete Account</button>
+        <!-- edited this part -->
+        <div class="popup" id="delete-popup">
+            <div class="popup-content">
+                <h2>Are you sure you want to delete your account?</h2>
+                <p>Your pending reservations will be cancelled</p>
+                <button class="cancel-btn">Cancel</button>
+                <button class="delete-btn">Delete</button>
+            </div>
+        </div>
+
+        <script src="js/User Profile.js"></script>
+        <script src="js/logout.js"></script> 
+    </div>
+</body>
+</html>

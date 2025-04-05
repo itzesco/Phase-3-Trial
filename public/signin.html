@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <link rel="stylesheet" href="css/signin.css">
+</head>
+<body>
+    <div class="container">
+        <h2 class="heading">Sign In</h2>
+        <form id="signin-form" class="form">
+            <div class="input-group1">
+                <label for="username">Username</label>
+                <input id="username" type="text" placeholder="Enter your username">
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <div class="password-wrapper">
+                    <input id="password" type="password" placeholder="Enter your password">
+                    <i class="fas fa-eye" onclick="togglePassword()"></i>
+                </div>
+            </div>
+            <div class="checkbox-group">
+                <input class="checkbox" type="checkbox" id="remember-me">
+                <label for="remember-me">Remember me</label>
+            </div>
+            <div class="error-message" id="error-message"></div> <!-- frontend update: changed the style and created own class -->
+            <div class="button-container">
+                <button type="submit" id="signin-button">Sign In</button>
+            </div>
+            <div class="text-center">
+                <span>New User? </span>
+                <a href="signup.html">Sign Up</a>
+            </div>
+        </form>
+    </div>
+    
+    <script src="js/signin.js"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Technician Dashboard</title>
+    <link rel="stylesheet" href="css/labtechniciandb.css">
+</head>
+<body>
+
+    <div class="dashboard">
+        <h1>Welcome, Lab Technician!</h1>
+        <p class="subtitle">Monitor and manage computer lab reservations efficiently.</p>
+
+        <div class="features">
+            <div class="feature-box">
+                <img src="images/user (4).png" alt="Profile" class="icons">
+                <p class="feature-text">User Account Management</p>
+            </div>
+            <div class="feature-box">
+                <img src="images/calendar-day (1).png" alt="Reservation" class="icons">
+                <p class="feature-text">Reservation Management</p>
+            </div>
+            <div class="feature-box">
+                <img src="images/time-past.png" alt="History" class="icons">
+                <p class="feature-text">View Reservation History</p>
+            </div>
+        </div>
+
+        <div id="data-container" class="table-container" style="display: none;">
+            <h2>Reservations</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Computer</th>
+                        <th>Student</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="reservation-data"></tbody>
+            </table>
+        </div>
+
+        <div class="logout-container">
+            <button id="logout-button" class="logout-btn">Logout</button>
+        </div>        
+
+    </div>
+
+    <script src="js/labtechniciandb.js"></script>
+    <script src="js/logout.js"></script> 
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <link rel="stylesheet" href="css/signup.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Create Account</h1>
+        <form id="signup-form">
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="first-name">First Name</label>
+                    <input type="text" id="first-name" placeholder="Enter your first name">
+                </div>
+                <div class="input-field">
+                    <label for="last-name">Last Name</label>
+                    <input type="text" id="last-name" placeholder="Enter your last name">
+                </div>
+            </div>
+            <div class="input-field">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username">
+            </div>
+            <div class="input-field">
+                <label for="email">Email address</label>
+                <input type="email" id="email" placeholder="Enter your DLSU email address">
+            </div>
+            <div class="input-field">
+                <label for="id-number">ID Number</label>
+                <input type="text" id="id-number" placeholder="Enter your DLSU ID number">
+            </div>
+            <div class="input-field">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter your password">
+            </div>
+            <p class="error-message" id="error-message"></p> <!-- frontend update: changed the style and created own class -->
+            <button type="submit" id="signup-button">Sign Up</button>
+        </form>
+        <p class="alr-account">Already have an account? <a href="signin.html">Sign In</a></p>
+    </div>
+    
+    <script src="js/signup.js"></script>
+</body>
+</html>

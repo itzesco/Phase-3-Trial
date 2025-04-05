@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #FFFEFB;
+    text-align: center;
+    margin: 0;
+    margin-top: 50px;
+    margin-bottom: 50px;
+}
+
+.dashboard {
+    max-width: 800px;
+    margin: auto;
+    background: #FFFEFB;
+    padding: 70px;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.30);
+}
+
+h1 {
+    font-size: 26px;
+    color: #094C2D;
+    margin: 0;
+    padding-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #094C2D;
+    margin: 0;
+    padding-bottom: 40px;
+}
+
+.features {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.feature-box {
+    width: 350px;
+    height: 30px;
+    background: #81A969;
+    color: white;
+    padding: 16px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    transition: 0.3s ease;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+
+}
+
+.feature-text {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0;
+
+}
+
+.feature-box:hover {
+    background: #70925C;
+    transform: scale(1.03);
+}
+
+.icons {
+    width: 20px;
+    height: 20px;
+}
+
+.table-container {
+    margin-top: 20px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background: #81A969;
+    color: white;
+}
+
+.status-available {
+    color: green;
+    font-weight: bold;
+}
+
+.status-reserved {
+    color: red;
+    font-weight: bold;
+}
+
+.status-anonymous {
+    color: orange;
+    font-weight: bold;
+}
+
+.logout-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+}
+
+.logout-btn {
+    background-color: #BC2828;
+    color: white;
+    padding: 14px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 90%;
+    max-width: 200px;
+    transition: 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; 
+}
+
+.logout-btn:hover {
+    background-color: #A72121;
+    transform: scale(1.05);
+}
