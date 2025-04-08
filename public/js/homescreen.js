@@ -431,10 +431,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         reservation.reservedBy?.email !== user.email // Ensure it fetches the correct user details
                     );
 
-                    if (reservationDetails) {
-                        // If the seat is reserved, show the reservation details
-                        updateReservationInfo(true, reservationDetails);
-                    } 
+                    updateReservationInfo(true, reservationDetails);
                 } 
 
                 // Handle seat selection/deselection logic for available seats
