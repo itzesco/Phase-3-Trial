@@ -431,7 +431,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                         reservation.reservedBy?.email !== user.email // Ensure it fetches the correct user details
                     );
 
-                    updateReservationInfo(true, reservationDetails);
+                    if (reservationDetails) {
+                        // If the seat is reserved, show the reservation details
+                        updateReservationInfo(true, reservationDetails);
+                    } else {
+                        alert("This computer is already reserved, but no details found.");
+                    }
+                    return;
                 } 
 
                 // Handle seat selection/deselection logic for available seats
@@ -458,7 +464,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                 // LATEST ADDED, FIXED BUG OF SHOWING RESERVE DEETS OF SEAT KAHIT AVAILABLE NA
                 // Check if the reservation exists and its status is not 'cancelled' or 'completed'
-                if (reservedDetails && reservedDetails.status !== "cancelled" && reservedDetails.status !== "completed") {
+                if (reservedDetails) {
                   updateReservationInfo(true, reservedDetails);  // Display reservation details
                 } else {
                   updateReservationInfo(false);  // Show available state (no reservation)
