@@ -461,6 +461,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     reservation.time === selectedTime &&
                     reservation.seats.every(seat => selectedSeats.includes(seat))
                 );
+                console.log(reservedDetails.status);  //testing
 
                 // LATEST ADDED, FIXED BUG OF SHOWING RESERVE DEETS OF SEAT KAHIT AVAILABLE NA
                 // Check if the reservation exists and its status is not 'cancelled' or 'completed'
