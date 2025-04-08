@@ -431,11 +431,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                         reservation.reservedBy?.email !== user.email // Ensure it fetches the correct user details
                     );
 
-                    if (reservationDetails) {
-                        // If the seat is reserved, show the reservation details
+                    if (reservedDetails && reservedDetails.status !== "cancelled" && reservedDetails.status !== "completed") {
+                      // If the seat is reserved, show the reservation details
                         updateReservationInfo(true, reservationDetails);
                     } else {
-                        alert("This computer is already reserved, but no details found.");
+                      updateReservationInfo(true, reservationDetails);
                     }
                     return;
                 } 
