@@ -12,41 +12,100 @@
         <h1>Welcome, Lab Technician!</h1>
         <p class="subtitle">Monitor and manage computer lab reservations efficiently.</p>
 
+        <!-- V13 - added "Book Reservation Button (PENDING, add respective icon/image nalang)"-->
         <div class="features">
             <div class="feature-box">
-                <img src="images/user (4).png" alt="Profile" class="icons">
-                <p class="feature-text">User Account Management</p>
+              <img src="images/user (4).png" alt="Profile" class="icons" />
+              <p class="feature-text">User Account Management</p>
             </div>
             <div class="feature-box">
-                <img src="images/calendar-day (1).png" alt="Reservation" class="icons">
-                <p class="feature-text">Reservation Management</p>
+              <img
+                src="images/calendar-day (1).png"
+                alt="Reservation"
+                class="icons"
+              />
+              <p class="feature-text">Reservation Management</p>
             </div>
+
             <div class="feature-box">
-                <img src="images/time-past.png" alt="History" class="icons">
+                <img src="images/user (4).png" alt="Book Reservations" class="icons"> 
                 <p class="feature-text">View Reservation History</p>
             </div>
-        </div>
 
-        <div id="data-container" class="table-container" style="display: none;">
-            <h2>Reservations</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Computer</th>
-                        <th>Student</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody id="reservation-data"></tbody>
-            </table>
+            <!--V15 - ADDED BOOK RESERVATIONS-->
+            <div class="feature-box">
+                <img src="images/booking.png" alt="Book Reservations" class="icons"> 
+                <p class="feature-text">Book Reservation</p>
+            </div>
         </div>
 
         <div class="logout-container">
             <button id="logout-button" class="logout-btn">Logout</button>
-        </div>        
+        </div>  
 
+        <!-- V13 - Filter for Reservation Management-->
+        <!-- RESERVATION MANAGEMENT Filters Section (Initially Hidden) -->
+        <div id="reservationManagement-filters-container" class="filters" style="display: none;">
+            <h3>Filter Reservations</h3>
+            
+            <!-- Status Filter -->
+            <label for="reservationManagement-status-filter">Filter by Status:</label>
+            <select id="reservationManagement-status-filter">
+                <option value="">All</option>
+                <option value="pending">Pending</option>
+                <option value="ongoing">Ongoing</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="successful">Successful</option>
+
+            </select>
+
+            <!-- Lab Filter -->
+            <label for="reservationManagement-lab-filter">Filter by Lab:</label>
+            <select id="reservationManagement-lab-filter">
+                <option value="">All</option>
+                <option value="Room 201">Room 201</option>
+                <option value="Room 202">Room 202</option>
+                <option value="Room 203">Room 203</option>
+                <option value="Room 204">Room 204</option>
+                <option value="Room 205">Room 205</option>
+            </select>
+
+            <!-- Date Filter -->
+            <label for="reservationManagement-date-filter">Filter by Date:</label>
+            <input type="date" id="reservationManagement-date-filter">
+        </div>
+
+        <!-- V15 - Filter for Reservation History-->
+        <!-- RESERVATION HISTORY Filters Section (Initially Hidden) -->
+        <div id="reservationHistory-filters-container" class="filters" style="display: none;">
+            <h3>Filter Reservations</h3>
+            
+            <!-- Status Filter -->
+            <label for="reservationHistory-status-filter">Filter by Status:</label>
+            <select id="reservationHistory-status-filter">
+                <option value="">All</option>
+                <option value="pending">Pending</option>
+                <option value="ongoing">Ongoing</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="successful">Successful</option>
+
+            </select>
+
+            <!-- Lab Filter -->
+            <label for="reservationHistory-lab-filter">Filter by Lab:</label>
+            <select id="reservationHistory-lab-filter">
+                <option value="">All</option>
+                <option value="Room 201">Room 201</option>
+                <option value="Room 202">Room 202</option>
+                <option value="Room 203">Room 203</option>
+                <option value="Room 204">Room 204</option>
+                <option value="Room 205">Room 205</option>
+            </select>
+
+            <!-- Date Filter -->
+            <label for="reservationHistory-date-filter">Filter by Date:</label>
+            <input type="date" id="reservationHistory-date-filter">
+        </div>
     </div>
 
     <script src="js/labtechniciandb.js"></script>

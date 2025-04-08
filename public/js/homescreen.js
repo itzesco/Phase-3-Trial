@@ -1,4 +1,23 @@
 document.addEventListener("DOMContentLoaded", async function () {
+  //v12
+  const usernameOnly = localStorage.getItem("username");
+  if (usernameOnly) {
+    try {
+      const response = await fetch(`/api/user?username=${usernameOnly}`);
+      const data = await response.json();
+
+      if (data.success && data.user?.firstName) {
+        document.getElementById(
+          "welcomeMessage"
+        ).textContent = `Welcome, ${data.user.firstName}!`;
+      } else {
+        console.warn("User data not found or incomplete.");
+      }
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+    }
+  }
+
   let reservations = [];
   let selected = {};
   let labs = [];
@@ -113,6 +132,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const reservationInfo = document.getElementById("reservationInfo");
   const logoutButton = document.getElementById("logout-button");
   const profileButton = document.getElementById("profile-button");
+  const aboutButton = document.getElementById("about-button");
   const user = JSON.parse(localStorage.getItem("user"));
   // added v9
   const anonymous = document.getElementById("anonymous");
@@ -231,13 +251,27 @@ document.addEventListener("DOMContentLoaded", async function () {
               <h2 class="reservation-text">${reservation.room}</h2>
               ${
                 !isPast
-                  ? `<img src="images/pencil.png" alt="Edit Icon" class="edit-btn" data-id=${reservation._id}>`: ""}
+                  ? `<img src="images/pencil.png" alt="Edit Icon" class="edit-btn" data-id=${reservation._id}>`
+                  : ""
+              }
             </div>
               <p class="reservation-text"><strong>Date:</strong> ${reservationDate.toDateString()}</p>
-              <p class="reservation-text"><strong>Time:</strong> ${reservation.time}</p>
-              <p class="reservation-text"><strong>Seat:</strong> ${reservation.seats.map(seat => `Comp ${seat}`).join(", ")}</p>
-              <p class="reservation-text"><strong>Reserved by:</strong> ${reservation.anonymous? reservation.email === user.email ? "Anonymous YOU": "Anonymous" : reservation.user}</p>
-              ${!isPast && `<div
+              <p class="reservation-text"><strong>Time:</strong> ${
+                reservation.time
+              }</p>
+              <p class="reservation-text"><strong>Seat:</strong> ${reservation.seats
+                .map(seat => `Comp ${seat}`)
+                .join(", ")}</p>
+              <p class="reservation-text"><strong>Reserved by:</strong> ${
+                reservation.anonymous
+                  ? reservation.email === user.email
+                    ? "Anonymous YOU"
+                    : "Anonymous"
+                  : reservation.user
+              }</p>
+              ${
+                !isPast &&
+                `<div
                     style="display:flex; align-items: end; justify-content:end; "
                   >
                     <button data-id='${reservation._id}' class="cancel-btn" style="background-color: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
@@ -254,7 +288,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     // }
     document.querySelectorAll(".edit-btn").forEach(btn => {
       btn.addEventListener("click", function () {
-        document.getElementById("reservedBtnTxt").innerHTML = "Update Reservation";
+        document.getElementById("reservedBtnTxt").innerHTML =
+          "Update Reservation";
         reserveBtn.style.backgroundColor = "#FFA500"; // Change to orange color
         const data = btn.getAttribute("data-id");
         const reservation = reservations.find(res => res._id === data);
@@ -295,78 +330,153 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 
+  /* ORIG - V15/V16
   function handleLabs() {
     labs?.length &&
       roomSelect.value &&
       labs
-        .find(lab => {
-          return lab._id === roomSelect.value;
-        })
-        .seats.filter(e => e.available)
-        .forEach(({ seatNumber }) => {
+        .find(lab => lab._id === roomSelect.value)
+        .seats.forEach(({ seatNumber, available }) => { // Iterate over all seats, regardless of availability
           let comp = document.createElement("div");
           comp.classList.add("computer");
           comp.textContent = `Comp ${seatNumber}`;
           comp.dataset.seat = Number(seatNumber);
+  
+          // If seat is reserved, apply 'reserved' class, else keep it normal
+          if (!available) {
+            comp.classList.add("reserved"); // Mark the seat as reserved visually
+            comp.setAttribute("data-id", `reserved_${seatNumber}`); // You can store a reserved flag or reservation ID
+          }
+  
+          // If the seat is selected for this reservation, mark it as selected
           if (
             seats.includes(Number(seatNumber)) &&
             selected.roomId === roomSelect.value &&
-            new Date(selected.date).toDateString() ===
-              new Date(monthSelect.value).toDateString() &&
+            new Date(selected.date).toDateString() === new Date(monthSelect.value).toDateString() &&
             selected.time === timeSelect.value
           ) {
             comp.classList.add("selected");
           }
-
+  
+          // Add click event to handle seat selection/deselection
           comp.addEventListener("click", function () {
             if (this.classList.contains("reserved")) {
+              // If the seat is reserved, show details and prevent selection
               const reservationId = this.getAttribute("data-id");
-              const reservationDetails = reservations.find(
-                e => e._id === reservationId
-              );
-              console.log("sdafsd", reservationDetails);
+              const reservationDetails = reservations.find(e => e._id === reservationId);
               if (reservationDetails) {
                 updateReservationInfo(true, reservationDetails);
               }
               alert("This computer is already reserved.");
               return;
             }
+  
+            // Toggle seat selection
             if (this.classList.contains("selected")) {
               this.classList.remove("selected");
-              seats = seats.filter(
-                seat => Number(seat) !== Number(this.dataset.seat)
-              );
+              seats = seats.filter(seat => Number(seat) !== Number(this.dataset.seat));
             } else {
               this.classList.add("selected");
               seats.push(Number(this.dataset.seat));
             }
+  
+            // Update the reservation details based on selected seats
             const selectedRoom = roomSelect.value.trim();
             const selectedDate = monthSelect.value.trim();
             const selectedTime = timeSelect.value.trim();
             const selectedSeats = seats;
-
+  
             const reservedDetails = reservations.find(
               res =>
                 res.roomId === selectedRoom &&
-                new Date(res.date).toDateString() ===
-                  new Date(selectedDate).toDateString() &&
+                new Date(res.date).toDateString() === new Date(selectedDate).toDateString() &&
                 res.time === selectedTime &&
                 res.seats === selectedSeats &&
                 res.email !== user.email
             );
-
+  
             if (reservedDetails) {
               updateReservationInfo(true, reservedDetails);
             } else {
               updateReservationInfo(false);
             }
           });
-
+  
+          // Append the seat to the grid
           computerGrid.appendChild(comp);
         });
   }
+  ORIG */
+  // TESTING
+  function handleLabs() {
+    if (labs?.length && roomSelect.value) {
+        const selectedLab = labs.find(lab => lab._id === roomSelect.value);
+
+        selectedLab?.seats.forEach(({ seatNumber, available }) => {
+            let comp = document.createElement("div");
+            comp.classList.add("computer");
+            comp.textContent = `Comp ${seatNumber}`;
+            comp.dataset.seat = seatNumber;
+
+            if (!available) {
+                comp.classList.add("reserved");
+                comp.setAttribute("data-id", seatNumber); // Use seat number for ID
+            }
+
+            comp.addEventListener("click", function () {
+                if (this.classList.contains("reserved")) {
+                    const seatNumber = this.getAttribute("data-id");
+                    const reservationDetails = reservations.find(reservation =>
+                        reservation.seats.includes(Number(seatNumber)) &&
+                        reservation.reservedBy?.email !== user.email // Ensure it fetches the correct user details
+                    );
+
+                    if (reservationDetails) {
+                        // If the seat is reserved, show the reservation details
+                        updateReservationInfo(true, reservationDetails);
+                    } else {
+                        alert("This computer is already reserved, but no details found.");
+                    }
+                    return;
+                }
+
+                // Handle seat selection/deselection logic for available seats
+                if (this.classList.contains("selected")) {
+                    this.classList.remove("selected");
+                    seats = seats.filter(seat => seat !== Number(this.dataset.seat));
+                } else {
+                    this.classList.add("selected");
+                    seats.push(Number(this.dataset.seat));
+                }
+
+                // Update reservation info when seats are selected
+                const selectedRoom = roomSelect.value.trim();
+                const selectedDate = monthSelect.value.trim();
+                const selectedTime = timeSelect.value.trim();
+                const selectedSeats = seats;
+
+                const reservedDetails = reservations.find(reservation =>
+                    reservation.roomId === selectedRoom &&
+                    new Date(reservation.date).toDateString() === new Date(selectedDate).toDateString() &&
+                    reservation.time === selectedTime &&
+                    reservation.seats.every(seat => selectedSeats.includes(seat))
+                );
+
+                if (reservedDetails) {
+                    updateReservationInfo(true, reservedDetails);
+                } else {
+                    updateReservationInfo(false);
+                }
+            });
+
+            computerGrid.appendChild(comp);
+        });
+    }
+}
+
 
   // Update seat colors based on reservation
+  /* original
   function updateSeatColors() {
     const selectedRoom = roomSelect.value.trim();
     const selectedDate = monthSelect.value.trim();
@@ -397,7 +507,39 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     });
   }
-
+  original */
+  function updateSeatColors() {
+    const selectedRoom = roomSelect.value.trim();
+    const selectedDate = monthSelect.value.trim();
+    const selectedTime = timeSelect.value.trim();
+    
+    // Clear all existing reserved classes
+    document.querySelectorAll(".computer").forEach(comp => {
+      comp.classList.remove("reserved");
+    });
+  
+    // Re-fetch seat availability to ensure it reflects the latest status
+    fetch(`/api/lab/${selectedRoom}/availability`)
+      .then(response => response.json())
+      .then(seats => {
+        // Re-apply the "reserved" class for unavailable seats
+        document.querySelectorAll(".computer").forEach(comp => {
+          const seatNumber = Number(comp.dataset.seat);
+          const seat = seats.find(s => s.seatNumber === seatNumber);
+  
+          if (seat && seat.available === false) {
+            comp.classList.add("reserved");
+            comp.setAttribute("data-id", `reserved_${seatNumber}`);
+          }
+        });
+      })
+      .catch(error => {
+        console.error("Error fetching seat availability:", error);
+      });
+    
+    handleWritter(); // testing
+    handleLabs();
+  }
   roomSelect.addEventListener("change", updateSeatColors);
   monthSelect.addEventListener("change", updateSeatColors);
   timeSelect.addEventListener("change", updateSeatColors);
@@ -432,54 +574,56 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     document.getElementById("confirmBtn").onclick = async function () {
       seats = [];
-      updateSeatColors();
-      // Change to green color
+      updateSeatColors(); // Refresh seat colors based on updated seat availability
+  
+      // Change to green color (this part is already in place)
       try {
-        await fetch("/api/reservations", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            _id: id,
-            labID: selectedRoom,
-            seats: selectedSeat,
-            reservedBy: user.id,
-            //added v9
-            anonymous: anonymous.checked,
-            timeSlot: {
-              date: new Date(`${selectedDate}`).toISOString(),
-              timeStart: selectedTime.split(" - ")[0],
-              timeEnd: selectedTime.split(" - ")[1],
-            },
-          }),
-        }).then(async () => {
-          seats = [];
-          selected = {};
-          reservations = [];
-          await getReservations();
-          handleWritter();
-          handleLabs();
-
-          document.getElementById("reservedBtnTxt").innerHTML = "Reserve Seat";
-          reserveBtn.style.backgroundColor = "#ffffff";
-        });
+          await fetch("/api/reservations", {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  _id: id,
+                  labID: selectedRoom,
+                  seats: selectedSeat,
+                  reservedBy: user.id,
+                  anonymous: anonymous.checked,
+                  timeSlot: {
+                      date: new Date(`${selectedDate}`).toISOString(),
+                      timeStart: selectedTime.split(" - ")[0],
+                      timeEnd: selectedTime.split(" - ")[1],
+                  },
+              }),
+          }).then(async () => {
+              seats = [];
+              selected = {};
+              reservations = [];
+              await getReservations(); // Re-fetch reservations to update the list
+              handleWritter(); // Update the current reservations list
+              handleLabs(); // Re-render the lab seats
+  
+              document.getElementById("reservedBtnTxt").innerHTML = "Reserve Seat";
+              reserveBtn.style.backgroundColor = "#ffffff";
+          });
       } catch (error) {
-        console.error("Error making reservation:", error);
+          console.error("Error making reservation:", error);
       }
-
+  
       alert(
-        `Reservation Successful for ${selectedSeat} on ${selectedDate}  at ${selectedTime}`
+          `Reservation Successful for ${selectedSeat} on ${selectedDate}  at ${selectedTime}`
       );
       document.getElementById("confirmationModal").style.display = "none";
-
+  
       seats = [];
       selected = {};
-
+  
+      // Ensure the seats are updated immediately
       updateSeatColors();
       reserveBtn.disabled = true;
-    };
+      location.reload();  // This will refresh the page
 
+  };
     document.getElementById("cancelBtn").onclick = function () {
       document.getElementById("confirmationModal").style.display = "none";
     };
@@ -491,6 +635,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   profileButton.addEventListener("click", function () {
     window.location.href = "User Profile.html";
+  });
+
+  aboutButton.addEventListener("click", function () {
+    window.location.href = "about.html";
   });
   // added v9
   document.addEventListener("click", function (event) {
@@ -520,83 +668,77 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   //v12
   // 🔍 Search input and popup logic
-const searchInput = document.querySelector(".search-input");
-const userProfilePopup = document.getElementById("userProfilePopup");
-const closeUserPopup = document.getElementById("closeUserPopup");
+  const searchInput = document.querySelector(".search-input");
+  const userProfilePopup = document.getElementById("userProfilePopup");
+  const closeUserPopup = document.getElementById("closeUserPopup");
 
-searchInput.addEventListener("keypress", async function (e) {
-  if (e.key === "Enter") {
-    const query = searchInput.value.trim();
-    if (!query) return;
+  searchInput.addEventListener("keypress", async function (e) {
+    if (e.key === "Enter") {
+      const query = searchInput.value.trim();
+      if (!query) return;
 
-    try {
-      const res = await fetch(`/api/user?username=${encodeURIComponent(query)}`);
-      const data = await res.json();
+      try {
+        const res = await fetch(
+          `/api/user?username=${encodeURIComponent(query)}`
+        );
+        const data = await res.json();
 
-      if (!data.success) {
-        alert("User not found.");
-        return;
-      }
+        if (!data.success) {
+          alert("User not found.");
+          return;
+        }
 
-      // Fill profile popup
-      document.getElementById("popup-fullname").textContent = `${data.user.firstName} ${data.user.lastName}`;
-      document.getElementById("popup-email").textContent = data.user.email;
-      document.getElementById("popup-id").textContent = `ID Num: ${data.user.idNumber}`;
-      document.getElementById("popup-description").textContent = data.user.bio || "No bio available.";
+        // Fill profile popup
+        document.getElementById(
+          "popup-fullname"
+        ).textContent = `${data.user.firstName} ${data.user.lastName}`;
+        document.getElementById("popup-email").textContent = data.user.email;
+        document.getElementById(
+          "popup-id"
+        ).textContent = `ID Num: ${data.user.idNumber}`;
+        document.getElementById("popup-description").textContent =
+          data.user.bio || "No bio available.";
 
-      // Fetch and filter reservations
-      const res2 = await fetch("/api/admin/reservations");
-      const allReservations = await res2.json();
-      const filtered = allReservations.filter(
-        r => r.reservedBy?.email === data.user.email && !r.anonymous
-      );
+        // Fetch and filter reservations
+        const res2 = await fetch("/api/admin/reservations");
+        const allReservations = await res2.json();
+        const filtered = allReservations.filter(
+          r => r.reservedBy?.email === data.user.email && !r.anonymous
+        );
 
-      const popupReservations = document.getElementById("popup-reservations");
-      popupReservations.innerHTML = "";
+        const popupReservations = document.getElementById("popup-reservations");
+        popupReservations.innerHTML = "";
 
-      if (filtered.length === 0) {
-        popupReservations.innerHTML = "<p>No reservations found.</p>";
-      } else {
-        filtered.forEach(r => {
-          popupReservations.innerHTML += `
+        if (filtered.length === 0) {
+          popupReservations.innerHTML = "<p>No reservations found.</p>";
+        } else {
+          filtered.forEach(r => {
+            popupReservations.innerHTML += `
             <p><strong>Room No.:</strong> ${r.labID.labName}</p>
-            <p><strong>Seat No.:</strong> ${r.seats.map(seat => `Comp ${seat}`).join(", ")}</p>
-            <p><strong>Date:</strong> ${new Date(r.timeSlot.date).toDateString()}</p>
-            <p><strong>Time:</strong> ${r.timeSlot.timeStart} - ${r.timeSlot.timeEnd}</p>
+            <p><strong>Seat No.:</strong> ${r.seats
+              .map(seat => `Comp ${seat}`)
+              .join(", ")}</p>
+            <p><strong>Date:</strong> ${new Date(
+              r.timeSlot.date
+            ).toDateString()}</p>
+            <p><strong>Time:</strong> ${r.timeSlot.timeStart} - ${
+              r.timeSlot.timeEnd
+            }</p>
             <hr />
           `;
-        });
+          });
+        }
+
+        userProfilePopup.style.display = "flex";
+      } catch (error) {
+        console.error("Error fetching profile info:", error);
+        alert("An error occurred while searching.");
       }
-
-      userProfilePopup.style.display = "flex";
-
-    } catch (error) {
-      console.error("Error fetching profile info:", error);
-      alert("An error occurred while searching.");
     }
-  }
-});
+  });
 
-// Close popup when X is clicked
-closeUserPopup.addEventListener("click", () => {
-  userProfilePopup.style.display = "none";
-});
-
-//v12
-const usernameOnly = localStorage.getItem("username");
-if (usernameOnly) {
-  try {
-    const response = await fetch(`/api/user?username=${usernameOnly}`);
-    const data = await response.json();
-
-    if (data.success && data.user?.firstName) {
-      document.getElementById("welcomeMessage").textContent = `Welcome, ${data.user.firstName}!`;
-    } else {
-      console.warn("User data not found or incomplete.");
-    }
-  } catch (error) {
-    console.error("Failed to fetch user data:", error);
-  }
-}
-
+  // Close popup when X is clicked
+  closeUserPopup.addEventListener("click", () => {
+    userProfilePopup.style.display = "none";
+  });
 });

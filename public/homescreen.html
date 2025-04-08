@@ -12,7 +12,6 @@
       <div class="header">
         <img src="images/logo.png" alt="Logo" class="logo" />
         <div class="header-container">
-          <!--v12 edited -->
           <h1 class="headerh2" id="welcomeMessage"></h1>
           <p class="subheader">Start reserving computer lab seats now!</p>
         </div>
@@ -23,6 +22,11 @@
             alt="Profile"
             class="profile-icon"
           />
+        </div>
+
+        <!-- added about us -->
+        <div id="about-button">
+          <img src="images/info (1).png" alt="About" class="about-icon" />
         </div>
 
         <div id="logout-button">
@@ -66,12 +70,13 @@
       <div class="box">
         <div class="card">
           <div class="card-header">
-            <h1 class="h1-text"> Your Current Reservations</h1>
+            <h1 class="h1-text">Your Current Reservations</h1>
           </div>
           <div class="card-body" id="reservationList"></div>
         </div>
       </div>
     </div>
+
 
     <div id="confirmationModal" class="modal">
       <div class="modal-content">
@@ -100,31 +105,32 @@
       </div>
     </div>
 
-<!-- User Profile Popup -->
-<div class="popup" id="userProfilePopup" style="display: none;">
-  <div class="popup-content">
-    <!-- Close button -->
-    <span class="close-popup" id="closeUserPopup">&times;</span>
-    <div class="profile-header">
-      <img src="images/circle-user.png" class="popup-profile-pic" alt="Profile Picture" />
-      <div>
-        <h2 id="popup-fullname">Full Name</h2>
-        <p id="popup-email">Email</p>
-        <p id="popup-id">ID Num: </p>
+    <!-- User Profile Popup -->
+    <div class="popup" id="userProfilePopup" style="display: none">
+      <div class="popup-content">
+        <!-- Close button -->
+        <span class="close-popup" id="closeUserPopup">&times;</span>
+        <div class="profile-header">
+          <img
+            src="images/circle-user.png"
+            class="popup-profile-pic"
+            alt="Profile Picture"
+          />
+          <div>
+            <h2 id="popup-fullname">Full Name</h2>
+            <p id="popup-email">Email</p>
+            <p id="popup-id">ID Num:</p>
+          </div>
+        </div>
+        <div class="popup-section">
+          <h3>Description</h3>
+          <p id="popup-description">Loading...</p>
+        </div>
+        <div class="popup-section">
+          <h3>Current Reservations</h3>
+          <div id="popup-reservations">No reservations found.</div>
+        </div>
       </div>
     </div>
-    <div class="popup-section">
-      <h3>Description</h3>
-      <p id="popup-description">Loading...</p>
-    </div>
-    <div class="popup-section">
-      <h3>Current Reservations</h3>
-      <div id="popup-reservations">No reservations found.</div>
-    </div>
-  </div>
-</div>
-
-
-
   </body>
 </html>
