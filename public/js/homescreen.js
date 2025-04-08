@@ -438,11 +438,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         alert("This computer is already reserved, but no details found.");
                     }
                     return;
-                } // TESTING
-                else {
-                  // When seat is available, remove any reservation details
-                  updateReservationInfo(false);
-                }
+                } 
 
                 // Handle seat selection/deselection logic for available seats
                 if (this.classList.contains("selected")) {
@@ -466,11 +462,12 @@ document.addEventListener("DOMContentLoaded", async function () {
                     reservation.seats.every(seat => selectedSeats.includes(seat))
                 );
 
-                if (reservedDetails) {
-                    updateReservationInfo(true, reservedDetails);
-                } else {
-                    updateReservationInfo(false);
-                }
+                // Check if the reservation exists and its status is not 'cancelled' or 'completed'
+if (reservedDetails && reservedDetails.status !== "cancelled" && reservedDetails.status !== "completed") {
+  updateReservationInfo(true, reservedDetails);  // Display reservation details
+} else {
+  updateReservationInfo(false);  // Show available state (no reservation)
+}
             });
 
             computerGrid.appendChild(comp);
