@@ -432,7 +432,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     );
 
                       // If a valid reservation is found and it is not cancelled or completed
-                      if (reservationDetails && reservationDetails.status !== "cancelled" && reservationDetails.status !== "completed") {
+                      if (reservationDetails && reservationDetails.status == "cancelled" && reservationDetails.status !== "completed") {
                         // Show reservation details
                         updateReservationInfo(true, reservationDetails);
                     } else {
