@@ -431,13 +431,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                         reservation.reservedBy?.email !== user.email // Ensure it fetches the correct user details
                     );
 
-                    if (reservedDetails && reservedDetails.status !== "cancelled" && reservedDetails.status !== "completed") {
-                      // If the seat is reserved, show the reservation details
+                    if (reservationDetails) {
+                        // If the seat is reserved, show the reservation details
                         updateReservationInfo(true, reservationDetails);
-                    } else {
-                      updateReservationInfo(true, reservationDetails);
-                    }
-                    return;
+                    } 
                 } 
 
                 // Handle seat selection/deselection logic for available seats
