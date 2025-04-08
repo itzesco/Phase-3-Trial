@@ -438,6 +438,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                         alert("This computer is already reserved, but no details found.");
                     }
                     return;
+                } // TESTING
+                else {
+                  // When seat is available, remove any reservation details
+                  updateReservationInfo(false);
                 }
 
                 // Handle seat selection/deselection logic for available seats
