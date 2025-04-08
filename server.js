@@ -110,6 +110,13 @@ app.post("/api/signin", async (req, res) => {
         .json({ success: false, message: "Invalid credentials" });
     }
 
+     // V13 - CHANGES: Check if the user is blocked
+     if (user.status === "Blocked") {
+      return res
+        .status(403)
+        .json({ success: false, message: "Your account is blocked" });
+    }
+
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res
@@ -117,12 +124,7 @@ app.post("/api/signin", async (req, res) => {
         .json({ success: false, message: "Invalid credentials" });
     }
 
-    // V13 - CHANGES: Check if the user is blocked
-    if (user.status === "Blocked") {
-      return res
-        .status(403)
-        .json({ success: false, message: "Your account is blocked" });
-    }
+   
 
     // Always generate a session
     const sessionToken = generateSessionToken();
