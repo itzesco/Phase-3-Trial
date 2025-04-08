@@ -315,6 +315,19 @@ app.post("/api/reservations", async (req, res) => {
         timeSlot,
       });
       await newReservation.save();
+
+      // Update seat availability to false (reserved) after the reservation is made
+            seats.forEach(seat => {
+              Lab.updateOne(
+                { _id: labID, "seats.seatNumber": seat },
+                { $set: { "seats.$.available": false } }
+              ).then(() => {
+                console.log(`Seat ${seat} marked as reserved.`);
+              }).catch(err => {
+                console.error("Error updating seat availability:", err);
+              });
+            });
+            
       res.status(201).json({
         message: "Reservation successful",
         reservation: newReservation,
@@ -411,21 +424,9 @@ app.delete("/api/admin/users/:id", async (req, res) => {
   }
 });
 
-// V2 ADDITTION
-// Get All Reservations
-app.get("/api/admin/reservations", async (req, res) => {
-  try {
-    const reservations = await Reservation.find({ canceled: false })
-      .populate("reservedBy", "firstName lastName email")
-      .populate("labID", "labName");
-    res.status(200).json(reservations);
-  } catch (error) {
-    res.status(500).json({ success: false, message: "Server error" });
-  }
-});
+
 
 /* V13 - Admin
-   CHANGES: Excludes reservations with the status "completed" from being fetched in the reservation management.
    DESCRIPTION: Fetches all reservations except those with the status "completed".
 */
 app.get("/api/admin/reservations", async (req, res) => {
