@@ -514,32 +514,38 @@ document.addEventListener("DOMContentLoaded", async function () {
     const selectedTime = timeSelect.value.trim();
     
     // Clear all existing reserved classes
-    document.querySelectorAll(".computer").forEach(comp => {
-      comp.classList.remove("reserved");
-    });
-  
-    // Re-fetch seat availability to ensure it reflects the latest status
-    fetch(`/api/lab/${selectedRoom}/availability`)
-      .then(response => response.json())
-      .then(seats => {
-        // Re-apply the "reserved" class for unavailable seats
-        document.querySelectorAll(".computer").forEach(comp => {
-          const seatNumber = Number(comp.dataset.seat);
-          const seat = seats.find(s => s.seatNumber === seatNumber);
-  
-          if (seat && seat.available === false) {
-            comp.classList.add("reserved");
-            comp.setAttribute("data-id", `reserved_${seatNumber}`);
-          }
-        });
-      })
-      .catch(error => {
-        console.error("Error fetching seat availability:", error);
+    function updateSeatColors() {
+      const selectedRoom = roomSelect.value.trim();
+      const selectedDate = monthSelect.value.trim();
+      const selectedTime = timeSelect.value.trim();
+      
+      // Clear all existing reserved classes
+      document.querySelectorAll(".computer").forEach(comp => {
+        comp.classList.remove("reserved");
       });
     
-    handleWritter(); // testing
-    handleLabs();
-  }
+      // Re-fetch seat availability to ensure it reflects the latest status
+      fetch(`/api/lab/${selectedRoom}/availability`)
+        .then(response => response.json())
+        .then(seats => {
+          // Re-apply the "reserved" class for unavailable seats
+          document.querySelectorAll(".computer").forEach(comp => {
+            const seatNumber = Number(comp.dataset.seat);
+            const seat = seats.find(s => s.seatNumber === seatNumber);
+    
+            if (seat && seat.available === false) {
+              comp.classList.add("reserved");
+              comp.setAttribute("data-id", `reserved_${seatNumber}`);
+            }
+          });
+        })
+        .catch(error => {
+          console.error("Error fetching seat availability:", error);
+        });
+      
+      handleWritter(); // testing
+      handleLabs();
+    }
   roomSelect.addEventListener("change", updateSeatColors);
   monthSelect.addEventListener("change", updateSeatColors);
   timeSelect.addEventListener("change", updateSeatColors);
