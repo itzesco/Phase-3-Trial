@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const bcrypt = require("bcrypt"); // For password hashing
+const bcrypt = require("bcryptjs"); // For password hashing
 const path = require("path");
 
 // Import the User model from models folder
@@ -19,7 +19,8 @@ app.use(bodyParser.json()); // To parse JSON requests
 app.use(express.static(path.join(__dirname, "public"))); // Serve static files like HTML, CSS, JS
 
 // MongoDB Connection
-const mongoURI ="mongodb+srv://admin1:CCAPDEV_admin1@cluster0.vd4se.mongodb.net/lab_reservation?retryWrites=true&w=majority";
+const mongoURI =
+  "mongodb+srv://admin1:CCAPDEV_admin1@cluster0.vd4se.mongodb.net/lab_reservation?retryWrites=true&w=majority";
 mongoose
   .connect(mongoURI)
   .then(() => console.log("MongoDB connected"))
@@ -51,7 +52,6 @@ const authMiddleware = async (req, res, next) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
-
 
 // POST Route for Sign-Up
 app.post("/api/signup", async (req, res) => {
@@ -88,50 +88,72 @@ app.post("/api/signup", async (req, res) => {
 
     // Save the user to the database
     await newUser.save();
+    //Edited response after registering #13.1
+    const sessionToken = generateSessionToken();
+    const expiresIn = 2 * 60 * 60 * 1000; // 2 hours
 
-    res
-      .status(201)
-      .json({ success: true, message: "User registered successfully" });
+    const newSession = new Session({
+      userId: newUser._id,
+      sessionToken,
+      dateExpired: Date.now() + expiresIn,
+    });
+
+    await newSession.save();
+
+    // Send token whether or not rememberMe is true
+    res.status(200).json({
+      success: true,
+      message: "Authenticated successfully",
+      sessionToken,
+      role: newUser.role,
+      user: { ...newUser, id: newUser._id, password: "" }, // Send user data without password
+    });
+
+    // res
+    //   .status(201)
+    //   .json({ success: true, message: "User registered successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
-// v12 POST Route for Sign-In (Authentication)
 app.post("/api/signin", async (req, res) => {
   const { username, password, rememberMe } = req.body;
 
   try {
+    // First, check if the user exists
     const user = await User.findOne({ username });
+
     if (!user) {
+      // If the user doesn't exist, return "Invalid credentials"
+
       return res
         .status(400)
         .json({ success: false, message: "Invalid credentials" });
     }
 
-     // LATEST CHANGES - CHANGES: Check if the user is blocked
-     if (user.status === "Blocked") {
+    // V13 - CHANGES: Check if the user is blocked
+    if (user.status === "Blocked") {
       return res
         .status(403)
         .json({ success: false, message: "Your account is blocked" });
     }
 
+    // Verify the password
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
+      // If password doesn't match, return "Invalid credentials"
       return res
         .status(400)
         .json({ success: false, message: "Invalid credentials" });
     }
 
-   
-
     // Always generate a session
     const sessionToken = generateSessionToken();
     const expiresIn = rememberMe
-      ? 21 * 24 * 60 * 60 * 1000  // 3 weeks
-      : 2 * 60 * 60 * 1000;      // 2 hours
-
+      ? 21 * 24 * 60 * 60 * 1000 // 3 weeks
+      : 2 * 60 * 60 * 1000; // 2 hours
 
     const newSession = new Session({
       userId: user._id,
@@ -147,44 +169,13 @@ app.post("/api/signin", async (req, res) => {
       message: "Authenticated successfully",
       sessionToken,
       role: user.role,
-      user: { email: user.email, id: user._id },
+      user: { ...user._doc, id: user._id, password: "" }, // Send user data without password
     });
   } catch (error) {
     console.error("Sign-in error:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
-
-
-app.get("/api/user", async (req, res) => {
-  const { username } = req.query;
-
-  try {
-    const user = await User.findOne({ username });
-
-    if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-    }
-
-    res.json({
-      success: true,
-      user: {
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        idNumber: user.idNumber,
-        bio: user.profile.bio,
-        status: user.status, // Include status field
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
-});
-
 
 // v12 Delete user account
 app.delete("/api/deleteAccount", authMiddleware, async (req, res) => {
@@ -200,7 +191,9 @@ app.delete("/api/deleteAccount", authMiddleware, async (req, res) => {
     // Remove all sessions for this user (logout from all devices)
     await Session.deleteMany({ userId });
 
-    res.status(200).json({ success: true, message: "Account deleted successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "Account deleted successfully" });
   } catch (error) {
     console.error("Error deleting account:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -218,14 +211,18 @@ app.put("/api/updatePassword", authMiddleware, async (req, res) => {
     // Validate current password
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
-      return res.status(400).json({ success: false, message: "Incorrect current password" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Incorrect current password" });
     }
 
     // Update with new password
     user.password = newPassword; // Pre-save hook will hash this
     await user.save();
 
-    res.status(200).json({ success: true, message: "Password updated successfully" });
+    res
+      .status(200)
+      .json({ success: true, message: "Password updated successfully" });
   } catch (error) {
     console.error("Error updating password:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -267,7 +264,8 @@ app.get("/api/lab/:id/availability", async (req, res) => {
   }
 });
 
-// Make a reservation -- UPDATED IN V5
+/*
+// OG - Make a reservation -- UPDATED IN V5
 app.post("/api/reservations", async (req, res) => {
   try {
     const { labID, seats, reservedBy, timeSlot, _id, anonymous } = req.body;
@@ -324,6 +322,88 @@ app.post("/api/reservations", async (req, res) => {
     res.status(500).json({ message: "Reservation Unsuccessful", error });
   }
 });
+*/
+
+/* V13 - Reservation Process
+   CHANGES: default status of reservation is changed to "pending"
+   DESCRIPTION: function that handles when user reserves
+*/
+// Example code to set seat availability to false after a reservation is made:
+// Example code to set seat availability to false after a reservation is made:
+app.post("/api/reservations", async (req, res) => {
+  try {
+    const { labID, seats, reservedBy, timeSlot, _id, anonymous } = req.body;
+    let existingReservation;
+    if (_id !== "") {
+      existingReservation = await Reservation.findById(_id);
+    }
+
+    if (existingReservation !== undefined) {
+      try {
+        await Reservation.findByIdAndUpdate(
+          _id,
+          {
+            labID,
+            seats,
+            reservedBy,
+            timeSlot,
+            anonymous,
+            status: "pending", // Ensure status is set to pending when updating
+          },
+          { new: true }
+        )
+          .then(updatedReservation => {
+            res.status(201).json({
+              message: "Reservation updated",
+              reservation: updatedReservation,
+            });
+          })
+          .catch(error => {
+            res
+              .status(500)
+              .json({ message: "Reservation update failed", error });
+          });
+      } catch (error) {
+        res.status(500).json({ message: "Reservation update failed", error });
+      }
+    } else {
+      // Create new reservation with status "pending"
+      const newReservation = new Reservation({
+        labID,
+        seats,
+        reservedBy,
+        anonymous,
+        timeSlot,
+        status: "pending", // Default status is pending
+      });
+      
+      await newReservation.save();
+
+      // Update seat availability to false (reserved) after the reservation is made
+      seats.forEach(seat => {
+        Lab.updateOne(
+          { _id: labID, "seats.seatNumber": seat },
+          { $set: { "seats.$.available": false } }
+        ).then(() => {
+          console.log(`Seat ${seat} marked as reserved.`);
+        }).catch(err => {
+          console.error("Error updating seat availability:", err);
+        });
+      });
+
+      res.status(201).json({
+        message: "Reservation successful",
+        reservation: newReservation,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Reservation Unsuccessful", error });
+  }
+});
+
+
+
+
 
 // Edit a reservation
 app.put("/api/reservations/:id", async (req, res) => {
@@ -358,10 +438,11 @@ app.delete("/api/reservations/:id", async (req, res) => {
 });
 // ======================= RESERVATION V5 =======================
 
-// ======================= ADMIN ROUTES =======================
+// ======================= ADMIN SIDE =======================
 
-// V2 ADDITTION
-// Get All Users (Admin Feature)
+/* V13 - ADMIN - User Account Management
+   DESCRIPTION: gets users from DB
+*/
 app.get("/api/admin/users", async (req, res) => {
   try {
     const users = await User.find(
@@ -411,16 +492,20 @@ app.delete("/api/admin/users/:id", async (req, res) => {
   }
 });
 
-// V2 ADDITTION
-// Get All Reservations
+/* V13 - Admin
+   CHANGES: Excludes reservations with the status "completed" from being fetched in the reservation management.
+   DESCRIPTION: Fetches all reservations except those with the status "completed".
+*/
 app.get("/api/admin/reservations", async (req, res) => {
   try {
-    const reservations = await Reservation.find({ canceled: false })
-      .populate("reservedBy", "firstName lastName email")
-      .populate("labID", "labName");
-    res.status(200).json(reservations);
+    // Fetch all reservations without any filtering
+    const reservations = await Reservation.find({})
+      .populate("reservedBy", "firstName lastName email") // Populate user details
+      .populate("labID", "labName"); // Populate lab details
+
+    res.status(200).json(reservations); // Return all reservations
   } catch (error) {
-    res.status(500).json({ success: false, message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error" }); // Error handling
   }
 });
 
@@ -435,6 +520,91 @@ app.delete("/api/admin/reservations/:id", async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
+/* V13 - ADMIN - Reservation Management
+   DESCRIPTION: updates the reservation status (when admin chooses to confirm, cancel, or complete)
+*/
+/* ORIGINAL
+app.put("/api/admin/reservations/:id", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const reservation = await Reservation.findById(id);
+    if (!reservation) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Reservation not found" });
+    }
+
+    // Only allow status change based on current status
+    if (status === "ongoing" && reservation.status === "pending") {
+      reservation.status = "ongoing";
+    } else if (status === "cancelled" && reservation.status === "pending") {
+      reservation.status = "cancelled";
+    } else if (status === "successful" && reservation.status === "ongoing") {
+      reservation.status = "successful";
+    } else {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid status change" });
+    }
+
+    await reservation.save();
+    res.status(200).json({ success: true, reservation });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+*/
+// V15 new reservation management
+app.put("/api/admin/reservations/:id", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+      const reservation = await Reservation.findById(id);
+      if (!reservation) {
+          return res.status(404).json({ success: false, message: "Reservation not found" });
+      }
+
+      // If reservation is canceled, mark the corresponding seat as available
+      if (status === "cancelled") {
+          // Assuming the reservation has a 'seats' array holding the seat numbers
+          await Lab.updateMany(
+              { 'seats.seatNumber': { $in: reservation.seats } }, // Find the seats that are reserved
+              { $set: { 'seats.$.available': true } } // Set those seats to available again
+          );
+      }
+
+        // If reservation is completed (successful), mark the corresponding seat as available
+    if (status === "successful") {
+      await Lab.updateMany(
+        { 'seats.seatNumber': { $in: reservation.seats } }, // Find the seats that are reserved
+        { $set: { 'seats.$.available': true } } // Set those seats to unavailable
+      );
+    }
+
+      // Only allow status change based on current status
+      if (status === "ongoing" && reservation.status === "pending") {
+          reservation.status = "ongoing";
+      } else if (status === "cancelled" && reservation.status === "pending") {
+          reservation.status = "cancelled";
+      } else if (status === "successful" && reservation.status === "ongoing") {
+          reservation.status = "successful";
+      } else {
+          return res.status(400).json({ success: false, message: "Invalid status change" });
+      }
+
+      await reservation.save();
+      res.status(200).json({ success: true, reservation });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 
 //V10 UPDATE EDIT PERSONAL INFORMATION
 app.put("/api/user", async (req, res) => {
@@ -463,6 +633,37 @@ app.put("/api/user", async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating user information:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// v13 #13.1
+
+app.get("/api/user", async (req, res) => {
+  const { username } = req.query;
+
+  try {
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    res.json({
+      success: true,
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        idNumber: user.idNumber,
+        bio: user.profile.bio,
+        status: user.status, // Include status field
+      },
+    });
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
