@@ -38,10 +38,10 @@ const ReservationSchema = new mongoose.Schema({
 
 module.exports = mongoose.model('Reservation', ReservationSchema); */
 
+// EXPLANATION: imports the "mongoose library", which is used in interacting with MongoDB
 const mongoose = require("mongoose");
 
-// Reservation Schema
-
+// Reservation Schema/DB
 const ReservationSchema = new mongoose.Schema({
   labID: {
     type: mongoose.Schema.Types.ObjectId,
@@ -87,6 +87,15 @@ const ReservationSchema = new mongoose.Schema({
     type: Date,
     default: Date.now, // Automatically set the date when reservation is made
   },
+  
+  // V13 Addition
+  status: {
+    type: String,
+    enum: ['pending', 'ongoing', 'cancelled', 'successful'],
+    default: 'pending', // Default status is pending
+  },
 });
+
+
 
 module.exports = mongoose.model("Reservation", ReservationSchema);
