@@ -1,0 +1,24 @@
+ADMIN
+username = labtech password = 123456
+
+
+USER
+username = rafaelsantos password = Rafael@12345
+
+USER
+username = camilleperez password = Camille#67890 or Camille@123
+
+USER 
+username = andrewmendoza password = Andrew!11223
+
+USER
+username = gabrielbautista password = Gab#98765
+
+USER TEST:
+
+username = practice password = pr@ct1c3l4ng pr4ct1ce@
+
+username John Doe password JohnDoe!12
+
+Username = MichealJordan password = MJTHEGOAT!123 or MJTHEGOAT!1234 or mjoverbron1!
+wisgg123!
