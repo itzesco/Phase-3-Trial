@@ -462,12 +462,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                     reservation.seats.every(seat => selectedSeats.includes(seat))
                 );
 
+                // LATEST ADDED, FIXED BUG OF SHOWING RESERVE DEETS OF SEAT KAHIT AVAILABLE NA
                 // Check if the reservation exists and its status is not 'cancelled' or 'completed'
-if (reservedDetails && reservedDetails.status !== "cancelled" && reservedDetails.status !== "completed") {
-  updateReservationInfo(true, reservedDetails);  // Display reservation details
-} else {
-  updateReservationInfo(false);  // Show available state (no reservation)
-}
+                if (reservedDetails && reservedDetails.status !== "cancelled" && reservedDetails.status !== "completed") {
+                  updateReservationInfo(true, reservedDetails);  // Display reservation details
+                } else {
+                  updateReservationInfo(false);  // Show available state (no reservation)
+                }
             });
 
             computerGrid.appendChild(comp);
