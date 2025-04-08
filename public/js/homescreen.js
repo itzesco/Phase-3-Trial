@@ -409,80 +409,71 @@ document.addEventListener("DOMContentLoaded", async function () {
   ORIG */
   // TESTING
   function handleLabs() {
-    labs?.length &&
-      roomSelect.value &&
-      labs
-        .find(lab => lab._id === roomSelect.value)
-        .seats.forEach(({ seatNumber, available }) => {  // Check availability of each seat
-          let comp = document.createElement("div");
-          comp.classList.add("computer");
-          comp.textContent = `Comp ${seatNumber}`;
-          comp.dataset.seat = Number(seatNumber);
-    
-          // If seat is reserved, apply 'reserved' class and disable further interaction
-          if (!available) {
-            comp.classList.add("reserved"); // Mark the seat as reserved visually
-            comp.setAttribute("data-id", `reserved_${seatNumber}`);  // You can store a reserved flag or reservation ID
-          }
-    
-          // If the seat is selected for this reservation, mark it as selected
-          if (
-            seats.includes(Number(seatNumber)) &&
-            selected.roomId === roomSelect.value &&
-            new Date(selected.date).toDateString() === new Date(monthSelect.value).toDateString() &&
-            selected.time === timeSelect.value
-          ) {
-            comp.classList.add("selected");
-          }
-    
-          // Add click event to handle seat selection/deselection
-          comp.addEventListener("click", function () {
-            if (this.classList.contains("reserved")) {
-              // If the seat is reserved, show details and prevent selection
-              const reservationId = this.getAttribute("data-id");
-              const reservationDetails = reservations.find(e => e._id === reservationId);
-              if (reservationDetails) {
-                updateReservationInfo(true, reservationDetails);
-              }
-              alert("This computer is already reserved.");
-              return;
+    if (labs?.length && roomSelect.value) {
+        const selectedLab = labs.find(lab => lab._id === roomSelect.value);
+
+        selectedLab?.seats.forEach(({ seatNumber, available }) => {
+            let comp = document.createElement("div");
+            comp.classList.add("computer");
+            comp.textContent = `Comp ${seatNumber}`;
+            comp.dataset.seat = seatNumber;
+
+            if (!available) {
+                comp.classList.add("reserved");
+                comp.setAttribute("data-id", seatNumber); // Use seat number for ID
             }
-    
-            // Toggle seat selection
-            if (this.classList.contains("selected")) {
-              this.classList.remove("selected");
-              seats = seats.filter(seat => Number(seat) !== Number(this.dataset.seat));
-            } else {
-              this.classList.add("selected");
-              seats.push(Number(this.dataset.seat));
-            }
-    
-            // Update the reservation details based on selected seats
-            const selectedRoom = roomSelect.value.trim();
-            const selectedDate = monthSelect.value.trim();
-            const selectedTime = timeSelect.value.trim();
-            const selectedSeats = seats;
-    
-            const reservedDetails = reservations.find(
-              res =>
-                res.roomId === selectedRoom &&
-                new Date(res.date).toDateString() === new Date(selectedDate).toDateString() &&
-                res.time === selectedTime &&
-                res.seats === selectedSeats &&
-                res.email !== user.email
-            );
-    
-            if (reservedDetails) {
-              updateReservationInfo(true, reservedDetails);
-            } else {
-              updateReservationInfo(false);
-            }
-          });
-    
-          // Append the seat to the grid
-          computerGrid.appendChild(comp);
+
+            comp.addEventListener("click", function () {
+                if (this.classList.contains("reserved")) {
+                    const seatNumber = this.getAttribute("data-id");
+                    const reservationDetails = reservations.find(reservation =>
+                        reservation.seats.includes(Number(seatNumber)) &&
+                        reservation.reservedBy?.email !== user.email // Ensure it fetches the correct user details
+                    );
+
+                    if (reservationDetails) {
+                        // If the seat is reserved, show the reservation details
+                        updateReservationInfo(true, reservationDetails);
+                    } else {
+                        alert("This computer is already reserved, but no details found.");
+                    }
+                    return;
+                }
+
+                // Handle seat selection/deselection logic for available seats
+                if (this.classList.contains("selected")) {
+                    this.classList.remove("selected");
+                    seats = seats.filter(seat => seat !== Number(this.dataset.seat));
+                } else {
+                    this.classList.add("selected");
+                    seats.push(Number(this.dataset.seat));
+                }
+
+                // Update reservation info when seats are selected
+                const selectedRoom = roomSelect.value.trim();
+                const selectedDate = monthSelect.value.trim();
+                const selectedTime = timeSelect.value.trim();
+                const selectedSeats = seats;
+
+                const reservedDetails = reservations.find(reservation =>
+                    reservation.roomId === selectedRoom &&
+                    new Date(reservation.date).toDateString() === new Date(selectedDate).toDateString() &&
+                    reservation.time === selectedTime &&
+                    reservation.seats.every(seat => selectedSeats.includes(seat))
+                );
+
+                if (reservedDetails) {
+                    updateReservationInfo(true, reservedDetails);
+                } else {
+                    updateReservationInfo(false);
+                }
+            });
+
+            computerGrid.appendChild(comp);
         });
-  }
+    }
+}
+
 
   // Update seat colors based on reservation
   /* original
