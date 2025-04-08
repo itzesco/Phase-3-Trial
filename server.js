@@ -424,6 +424,23 @@ app.get("/api/admin/reservations", async (req, res) => {
   }
 });
 
+/* V13 - Admin
+   CHANGES: Excludes reservations with the status "completed" from being fetched in the reservation management.
+   DESCRIPTION: Fetches all reservations except those with the status "completed".
+*/
+app.get("/api/admin/reservations", async (req, res) => {
+  try {
+    // Fetch all reservations without any filtering
+    const reservations = await Reservation.find({})
+      .populate("reservedBy", "firstName lastName email") // Populate user details
+      .populate("labID", "labName"); // Populate lab details
+
+    res.status(200).json(reservations); // Return all reservations
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error" }); // Error handling
+  }
+});
+
 // V2 ADDITTION
 // Cancel a Reservation
 app.delete("/api/admin/reservations/:id", async (req, res) => {
@@ -435,6 +452,54 @@ app.delete("/api/admin/reservations/:id", async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
+// V15 new reservation management
+app.put("/api/admin/reservations/:id", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+      const reservation = await Reservation.findById(id);
+      if (!reservation) {
+          return res.status(404).json({ success: false, message: "Reservation not found" });
+      }
+
+      // If reservation is canceled, mark the corresponding seat as available
+      if (status === "cancelled") {
+          // Assuming the reservation has a 'seats' array holding the seat numbers
+          await Lab.updateMany(
+              { 'seats.seatNumber': { $in: reservation.seats } }, // Find the seats that are reserved
+              { $set: { 'seats.$.available': true } } // Set those seats to available again
+          );
+      }
+
+        // If reservation is completed (successful), mark the corresponding seat as available
+    if (status === "successful") {
+      await Lab.updateMany(
+        { 'seats.seatNumber': { $in: reservation.seats } }, // Find the seats that are reserved
+        { $set: { 'seats.$.available': true } } // Set those seats to unavailable
+      );
+    }
+
+      // Only allow status change based on current status
+      if (status === "ongoing" && reservation.status === "pending") {
+          reservation.status = "ongoing";
+      } else if (status === "cancelled" && reservation.status === "pending") {
+          reservation.status = "cancelled";
+      } else if (status === "successful" && reservation.status === "ongoing") {
+          reservation.status = "successful";
+      } else {
+          return res.status(400).json({ success: false, message: "Invalid status change" });
+      }
+
+      await reservation.save();
+      res.status(200).json({ success: true, reservation });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 
 //V10 UPDATE EDIT PERSONAL INFORMATION
 app.put("/api/user", async (req, res) => {
