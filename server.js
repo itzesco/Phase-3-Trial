@@ -286,10 +286,9 @@ app.post("/api/reservations", async (req, res) => {
             reservedBy,
             timeSlot,
             anonymous,
+            status: "pending", // Ensure status is set to pending when updating
           },
-          {
-            new: true,
-          }
+          { new: true }
         )
           .then(updatedReservation => {
             res.status(201).json({
@@ -306,28 +305,30 @@ app.post("/api/reservations", async (req, res) => {
         res.status(500).json({ message: "Reservation update failed", error });
       }
     } else {
-      // Edited v10 add anonymous
+      // Create new reservation with status "pending"
       const newReservation = new Reservation({
         labID,
         seats,
         reservedBy,
         anonymous,
         timeSlot,
+        status: "pending", // Default status is pending
       });
+      
       await newReservation.save();
 
       // Update seat availability to false (reserved) after the reservation is made
-            seats.forEach(seat => {
-              Lab.updateOne(
-                { _id: labID, "seats.seatNumber": seat },
-                { $set: { "seats.$.available": false } }
-              ).then(() => {
-                console.log(`Seat ${seat} marked as reserved.`);
-              }).catch(err => {
-                console.error("Error updating seat availability:", err);
-              });
-            });
-            
+      seats.forEach(seat => {
+        Lab.updateOne(
+          { _id: labID, "seats.seatNumber": seat },
+          { $set: { "seats.$.available": false } }
+        ).then(() => {
+          console.log(`Seat ${seat} marked as reserved.`);
+        }).catch(err => {
+          console.error("Error updating seat availability:", err);
+        });
+      });
+
       res.status(201).json({
         message: "Reservation successful",
         reservation: newReservation,
