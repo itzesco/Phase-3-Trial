@@ -432,8 +432,12 @@ document.addEventListener("DOMContentLoaded", async function () {
                     );
 
                     if (reservationDetails) {
-                        // If the seat is reserved, show the reservation details
-                        updateReservationInfo(true, reservationDetails);
+                        // If the seat is reserved, show the reservation details, but check if it's canceled or completed
+                        if (reservationDetails.status !== "cancelled" && reservationDetails.status !== "completed") {
+                            updateReservationInfo(true, reservationDetails);
+                        } else {
+                            updateReservationInfo(false); // If it's canceled or completed, show it as available
+                        }
                     } else {
                         alert("This computer is already reserved, but no details found.");
                     }
@@ -462,8 +466,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     reservation.seats.every(seat => selectedSeats.includes(seat))
                 );
 
-                // LATEST ADDED, FIXED BUG OF SHOWING RESERVE DEETS OF SEAT KAHIT AVAILABLE NA
-                // Check if the reservation exists and its status is not 'cancelled' or 'completed'
+                // If a reservation is found and is not canceled or completed
                 if (reservedDetails && reservedDetails.status !== "cancelled" && reservedDetails.status !== "completed") {
                   updateReservationInfo(true, reservedDetails);  // Display reservation details
                 } else {
@@ -475,6 +478,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 }
+
 
 
   // Update seat colors based on reservation
@@ -574,6 +578,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     );
     document.getElementById("confirmationModal").style.display = "flex";
 
+    // when user chooses to confirm reservation
     document.getElementById("confirmBtn").onclick = async function () {
       seats = [];
       updateSeatColors(); // Refresh seat colors based on updated seat availability
