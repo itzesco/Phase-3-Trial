@@ -464,7 +464,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                 // LATEST ADDED, FIXED BUG OF SHOWING RESERVE DEETS OF SEAT KAHIT AVAILABLE NA
                 // Check if the reservation exists and its status is not 'cancelled' or 'completed'
-                if (reservedDetails && reservedDetails.status !== "cancelled" && reservedDetails.status !== "completed") {
+                if (reservedDetails) {
                   updateReservationInfo(true, reservedDetails);  // Display reservation details
                 } else {
                   updateReservationInfo(false);  // Show available state (no reservation)
