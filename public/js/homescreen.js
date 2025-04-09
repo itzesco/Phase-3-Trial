@@ -240,6 +240,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("reservationList").innerHTML = "";
     reservations
       .filter(e => e.email === user.email)
+      .filter(reservation => reservation.status !== "cancelled" && reservation.status !== "completed") // **New filter**: Filter out cancelled and completed reservations
       .forEach((reservation, i) => {
         const reservationDate = new Date(reservation.date);
         const today = new Date().setDate(new Date().getDate() - 1);
