@@ -461,21 +461,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                 } 
                 else
                 {
-                  const reservedDetails = reservations.find(reservation =>
-                    reservation.roomId === selectedRoom &&
-                    new Date(reservation.date).toDateString() === new Date(selectedDate).toDateString() &&
-                    reservation.time === selectedTime &&
-                    reservation.seats.every(seat => selectedSeats.includes(seat)) &&
-                    reservation.status !== "cancelled" && reservation.status !== "completed"
-                );
-                
-
-                // If a reservation is found and is not canceled or completed
-                if (reservedDetails) {
-                  updateReservationInfo(true, reservedDetails);  // Display reservation details
-                } else {
                   updateReservationInfo(false);  // Show available state (no reservation)
-                }
+
+                  
 
                 }
 
