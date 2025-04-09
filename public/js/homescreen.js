@@ -407,7 +407,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
   }
   ORIG */
-  /* PINAKALATEST NA HANDLE LABS
+  // TESTING
   function handleLabs() {
     if (labs?.length && roomSelect.value) {
         const selectedLab = labs.find(lab => lab._id === roomSelect.value);
@@ -423,7 +423,23 @@ document.addEventListener("DOMContentLoaded", async function () {
                 comp.setAttribute("data-id", seatNumber); // Use seat number for ID
             }
 
-            comp.addEventListener("click", function () {
+            comp.addEventListener("click", function () 
+            {
+               // Handle seat selection/deselection logic for available seats
+               if (this.classList.contains("selected")) {
+                this.classList.remove("selected");
+                seats = seats.filter(seat => seat !== Number(this.dataset.seat));
+            } else {
+                this.classList.add("selected");
+                seats.push(Number(this.dataset.seat));
+            }
+
+            // Update reservation info when seats are selected
+            const selectedRoom = roomSelect.value.trim();
+            const selectedDate = monthSelect.value.trim();
+            const selectedTime = timeSelect.value.trim();
+            const selectedSeats = seats;
+
                 if (this.classList.contains("reserved")) {
                     const seatNumber = this.getAttribute("data-id");
                     const reservationDetails = reservations.find(reservation =>
@@ -443,23 +459,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                     }
                     return;
                 } 
-
-                // Handle seat selection/deselection logic for available seats
-                if (this.classList.contains("selected")) {
-                    this.classList.remove("selected");
-                    seats = seats.filter(seat => seat !== Number(this.dataset.seat));
-                } else {
-                    this.classList.add("selected");
-                    seats.push(Number(this.dataset.seat));
-                }
-
-                // Update reservation info when seats are selected
-                const selectedRoom = roomSelect.value.trim();
-                const selectedDate = monthSelect.value.trim();
-                const selectedTime = timeSelect.value.trim();
-                const selectedSeats = seats;
-
-                const reservedDetails = reservations.find(reservation =>
+                else
+                {
+                  const reservedDetails = reservations.find(reservation =>
                     reservation.roomId === selectedRoom &&
                     new Date(reservation.date).toDateString() === new Date(selectedDate).toDateString() &&
                     reservation.time === selectedTime &&
@@ -472,86 +474,18 @@ document.addEventListener("DOMContentLoaded", async function () {
                 } else {
                   updateReservationInfo(false);  // Show available state (no reservation)
                 }
+
+                }
+
+               
+
+              
             });
 
             computerGrid.appendChild(comp);
         });
     }
-} */
-
-    function handleLabs() {
-      if (labs?.length && roomSelect.value) {
-          const selectedLab = labs.find(lab => lab._id === roomSelect.value);
-  
-          selectedLab?.seats.forEach(({ seatNumber, available }) => {
-              let comp = document.createElement("div");
-              comp.classList.add("computer");
-              comp.textContent = `Comp ${seatNumber}`;
-              comp.dataset.seat = seatNumber;
-  
-              // If the seat is available, don't show any reservation details
-              if (!available) {
-                  comp.classList.add("reserved");
-                  comp.setAttribute("data-id", seatNumber); // Store seat number for reference
-              }
-  
-              comp.addEventListener("click", function () {
-                  if (this.classList.contains("reserved")) {
-                      const seatNumber = this.getAttribute("data-id");
-                      const reservationDetails = reservations.find(reservation =>
-                          reservation.seats.includes(Number(seatNumber)) &&
-                          reservation.reservedBy?.email !== user.email // Ensure it fetches the correct user details
-                      );
-  
-                      if (reservationDetails) {
-                          // Only show reservation details if the seat is not available
-                          if (reservationDetails.status !== "cancelled" && reservationDetails.status !== "completed") {
-                              updateReservationInfo(true, reservationDetails); // Show reservation details
-                          } else {
-                              updateReservationInfo(false); // If cancelled or completed, show available state
-                          }
-                      } else {
-                          alert("This computer is already reserved, but no details found.");
-                      }
-                      return;
-                  }
-  
-                  // Handle seat selection/deselection logic for available seats
-                  if (this.classList.contains("selected")) {
-                      this.classList.remove("selected");
-                      seats = seats.filter(seat => seat !== Number(this.dataset.seat));
-                  } else {
-                      this.classList.add("selected");
-                      seats.push(Number(this.dataset.seat));
-                  }
-  
-                  // Update reservation info when seats are selected
-                  const selectedRoom = roomSelect.value.trim();
-                  const selectedDate = monthSelect.value.trim();
-                  const selectedTime = timeSelect.value.trim();
-                  const selectedSeats = seats;
-  
-                  const reservedDetails = reservations.find(reservation =>
-                      reservation.roomId === selectedRoom &&
-                      new Date(reservation.date).toDateString() === new Date(selectedDate).toDateString() &&
-                      reservation.time === selectedTime &&
-                      reservation.seats.every(seat => selectedSeats.includes(seat))
-                  );
-  
-                  // Only show details for reserved seats that are not canceled or completed
-                  if (reservedDetails && reservedDetails.status !== "cancelled" && reservedDetails.status !== "completed") {
-                      updateReservationInfo(true, reservedDetails);  // Display reservation details
-                  } else {
-                      updateReservationInfo(false);  // Show available state (no reservation)
-                  }
-              });
-  
-              computerGrid.appendChild(comp);
-          });
-      }
-  }
-  
-    
+} 
 
 
 
@@ -705,6 +639,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       location.reload();  // This will refresh the page
 
   };
+  
     document.getElementById("cancelBtn").onclick = function () {
       document.getElementById("confirmationModal").style.display = "none";
     };
